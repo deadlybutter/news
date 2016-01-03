@@ -1,0 +1,62 @@
+$tile_background: #001f3f;
+$page_background: #000C19;
+$color: #FFF;
+
+* {
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  background-color: $page_background;
+}
+
+.tile_container {
+  text-align: center;
+  padding-top: .5%;
+}
+
+.tile {
+  display: inline-table;
+  width: 24.5%;
+  height: 300px;
+  background-color: $tile_background;
+  color: $color;
+  background-size: cover;
+  background-position: center;
+
+  &:hover {
+    a {
+      display: table-cell;
+      h1 {
+        background-color: $page_background;
+      }
+    }
+  }
+
+  a {
+    text-decoration: none;
+    color: inherit;
+    text-align: left;
+    vertical-align: bottom;
+    padding-left: 1%;
+
+    display: none;
+  }
+
+  h1, h3 {
+    display: block;
+    word-break: break-word;
+    -ms-hyphens: auto;
+    -moz-hyphens: auto;
+    -webkit-hyphens: auto;
+    hyphens: auto;
+  }
+
+}
+
+.tile_no-hide {
+  a {
+    display: table-cell !important;
+  }
+}
