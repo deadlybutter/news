@@ -22,8 +22,11 @@ app.use(sassMiddleware({
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(express.static(path.join(__dirname, 'node_modules/@dosomething/forge/dist')));
 
+var fs = require('fs');
+var scripts = fs.readdirSync(__dirname + '/public/js');
+
 app.get('/', function(req, res) {
-  res.render('home', {"scripts": ['nytimes']});
+  res.render('home', {"scripts": scripts});
 });
 
 app.get('/q', function(req, res) {
