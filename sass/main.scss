@@ -1,5 +1,6 @@
 $color: #000C19;
 $background-color: #FFF;
+$spacing: 16px;
 
 * {
   margin: 0;
@@ -8,12 +9,30 @@ $background-color: #FFF;
 
 body {
   background-color: $background-color;
+  text-align: center;
+}
+
+.headline-container {
+  padding: 10px;
+}
+
+.stat {
+  display: inline-block;
+  border: 1px solid $color;
+  padding: $spacing;
+  margin: $spacing / 4;
 }
 
 a {
+  text-align: left;
   color: $color;
   text-decoration: none;
-  padding: 10 + random(20) + px;
+  font-size: 24px;
+  display: block;
+  margin-top: $spacing;
+  margin-left: $spacing;
+  border-left: 1px solid $color;
+  padding: $spacing / 4;
 
   &:hover {
     text-decoration: underline;
