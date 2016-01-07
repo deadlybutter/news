@@ -68,7 +68,7 @@ function calculateStats() {
   var sorted = sortObject(wordCount);
   console.log(sorted);
   sorted.forEach(function(element, index) {
-    if (element.value < 3) {
+    if (element.value < 4) {
       return;
     }
     $('body').prepend('<p class="stat">' + element.key + ", " + element.value + '</p>');
