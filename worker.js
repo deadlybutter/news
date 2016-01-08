@@ -1,6 +1,11 @@
 var cheerio = require('cheerio');
 var request = require('superagent');
 
+if (process.env.FIREBASE_URL) {
+  var Firebase = require("firebase");
+  var rootRef = new Firebase(process.env.FIREBASE_URL);
+}
+
 var wordCount = {};
 
 function getRandomInt(min, max) {
@@ -77,7 +82,12 @@ function calculateStats() {
   var sorted = sortObject(wordCount);
   var existingData = process.env['data'];
   if (existingData != undefined) {
-    existingData = JSON.parse(process.env['data']);
+    try {
+      existingData = JSON.parse(process.env['data']);
+    }
+    catch (e) {
+      existingData = undefined;
+    }
   }
   var tracking = [];
   sorted.forEach(function(element, index) {
@@ -90,6 +100,9 @@ function calculateStats() {
       existingData.forEach(function(existingElement) {
         if (existingElement.key == element.key) {
           existingElement.value.push(element.value[0]);
+          if (existingElement.value.length > 50) {
+            existingElement.value.shift();
+          }
           element.value = existingElement.value;
         }
       });
@@ -97,9 +110,10 @@ function calculateStats() {
 
     tracking.push(element);
   });
-  process.env.data = JSON.stringify(tracking);
-  fs.writeFileSync(__dirname + '/data.json', process.env.data);
-  console.log(process.env['data']);
+  process.env['data'] = JSON.stringify(tracking);
+  if (process.env.FIREBASE_URL) {
+    myRootRef.set('data', process.env['data']);
+  }
 }
 
 // LOAD SCRAPERS
