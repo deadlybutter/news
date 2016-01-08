@@ -4,6 +4,7 @@ var request = require('superagent');
 if (process.env.FIREBASE_URL) {
   var Firebase = require("firebase");
   var rootRef = new Firebase(process.env.FIREBASE_URL);
+  process.env['data'] = rootRef.child('data');
 }
 
 var wordCount = {};
