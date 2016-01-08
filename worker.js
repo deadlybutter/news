@@ -98,6 +98,7 @@ function calculateStats() {
     tracking.push(element);
   });
   process.env.data = JSON.stringify(tracking);
+  fs.writeFileSync(__dirname + '/data.json', process.env.data);
   console.log(process.env['data']);
 }
 
@@ -127,6 +128,14 @@ this.finishedScraping = function(scriptName, count) {
   if (scriptChecklist.length == 0) {
     calculateStats();
   }
+}
+
+// Make sure we have a data.json
+// Intentionally using sync methods, I want to make sure nothing else happens
+try {
+  process.env['data'] = fs.readFileSync(__dirname + '/data.json');
+} catch (e) {
+  fs.writeFileSync(__dirname + '/data.json', '');
 }
 
 scrapContent();
