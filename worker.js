@@ -1,19 +1,6 @@
 var cheerio = require('cheerio');
 var request = require('superagent');
 
-if (process.env.FIREBASE_URL) {
-  var Firebase = require("firebase");
-  var rootRef = new Firebase(process.env.FIREBASE_URL);
-  rootRef.once("value", function(snapshot) {
-    var data = snapshot.val();
-    process.env['data'] = data;
-    startUp();
-  });
-}
-else {
-  startUp();
-}
-
 var wordCount = {};
 
 function getRandomInt(min, max) {
@@ -91,10 +78,12 @@ function calculateStats() {
   var existingData = process.env['data'];
   if (existingData != undefined) {
     try {
-      existingData = JSON.parse(process.env['data']);
+      container = JSON.parse(process.env['data']);
+      existingData = JSON.parse(container.data);
     }
     catch (e) {
       existingData = undefined;
+      console.log(e);
     }
   }
   var tracking = [];
@@ -152,15 +141,20 @@ this.finishedScraping = function(scriptName, count) {
   }
 }
 
-// Make sure we have a data.json
-// Intentionally using sync methods, I want to make sure nothing else happens
-try {
-  process.env['data'] = fs.readFileSync(__dirname + '/data.json');
-} catch (e) {
-  fs.writeFileSync(__dirname + '/data.json', '');
-}
-
 function startUp() {
   scrapContent();
   setInterval(scrapContent, 1000 * 60 * 2); // Run it every 2 minutes
+}
+
+if (process.env.FIREBASE_URL) {
+  var Firebase = require("firebase");
+  var rootRef = new Firebase(process.env.FIREBASE_URL);
+  rootRef.once("value", function(snapshot) {
+    var data = snapshot.val();
+    process.env['data'] = JSON.stringify(data);
+    startUp();
+  });
+}
+else {
+  startUp();
 }
