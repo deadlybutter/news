@@ -22,24 +22,8 @@ app.use(sassMiddleware({
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(express.static(path.join(__dirname, 'node_modules/@dosomething/forge/dist')));
 
-var fs = require('fs');
-var scripts = fs.readdirSync(__dirname + '/public/js');
-
 app.get('/', function(req, res) {
-  res.render('home', {"scripts": scripts});
-});
-
-app.get('/q', function(req, res) {
-  var url = req.query.url;
-  request
-    .get(url)
-    .end(function(err, webpageData) {
-      if (err) {
-        res.sendStatus(500);
-        return;
-      }
-      res.send(webpageData.text);
-    });
+  res.render('home');
 });
 
 var server = app.listen(process.env.PORT || 3000, function() {
