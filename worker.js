@@ -4,7 +4,14 @@ var request = require('superagent');
 if (process.env.FIREBASE_URL) {
   var Firebase = require("firebase");
   var rootRef = new Firebase(process.env.FIREBASE_URL);
-  process.env['data'] = rootRef.child('data');
+  rootRef.once("value", function(snapshot) {
+    var data = snapshot.val();
+    process.env['data'] = data;
+    startUp();
+  });
+}
+else {
+  startUp();
 }
 
 var wordCount = {};
@@ -153,5 +160,7 @@ try {
   fs.writeFileSync(__dirname + '/data.json', '');
 }
 
-scrapContent();
-setInterval(scrapContent, 1000 * 60 * 2); // Run it every 2 minutes
+function startUp() {
+  scrapContent();
+  setInterval(scrapContent, 1000 * 60 * 2); // Run it every 2 minutes
+}
