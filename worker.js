@@ -112,7 +112,7 @@ function calculateStats() {
   });
   process.env['data'] = JSON.stringify(tracking);
   if (process.env.FIREBASE_URL) {
-    myRootRef.set('data', process.env['data']);
+    rootRef.set('data', process.env['data']);
   }
 }
 
