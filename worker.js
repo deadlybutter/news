@@ -1,6 +1,8 @@
 var cheerio = require('cheerio');
 var request = require('superagent');
 
+var data = [];
+
 var wordCount = {};
 
 function getRandomInt(min, max) {
@@ -75,16 +77,9 @@ this.buildHeadline = function(text) {
 
 function calculateStats() {
   var sorted = sortObject(wordCount);
-  var existingData = process.env['data'];
-  if (existingData != undefined) {
-    try {
-      container = JSON.parse(process.env['data']);
-      existingData = JSON.parse(container.data);
-    }
-    catch (e) {
-      existingData = undefined;
-      console.log(e);
-    }
+  var existingData = [];
+  if (data != undefined) {
+    existingData = data.slice();
   }
   var tracking = [];
   sorted.forEach(function(element, index) {
@@ -107,9 +102,9 @@ function calculateStats() {
 
     tracking.push(element);
   });
-  process.env['data'] = JSON.stringify(tracking);
+  data = tracking;
   if (process.env.FIREBASE_URL) {
-    rootRef.set({'data': process.env['data']});
+    rootRef.set({'data': data});
   }
 }
 
@@ -150,8 +145,7 @@ if (process.env.FIREBASE_URL) {
   var Firebase = require("firebase");
   var rootRef = new Firebase(process.env.FIREBASE_URL);
   rootRef.once("value", function(snapshot) {
-    var data = snapshot.val();
-    process.env['data'] = JSON.stringify(data);
+    data = snapshot.val().data;
     startUp();
   });
 }

@@ -22,13 +22,33 @@ app.use(sassMiddleware({
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(express.static(path.join(__dirname, 'node_modules/@dosomething/forge/dist')));
 
+var data = {};
+
 app.get('/', function(req, res) {
   res.render('home');
 });
 
-var server = app.listen(process.env.PORT || 3000, function() {
-  var host = server.address().address;
-  var port = server.address().port;
-
-  console.log('Example app listening at http://%s:%s', host, port);
+app.get('/data', function(req, res) {
+  res.json(data);
 });
+
+function startUp() {
+  var server = app.listen(process.env.PORT || 3000, function() {
+    var host = server.address().address;
+    var port = server.address().port;
+
+    console.log('Example app listening at http://%s:%s', host, port);
+  });
+}
+
+if (process.env.FIREBASE_URL) {
+  var Firebase = require("firebase");
+  var rootRef = new Firebase(process.env.FIREBASE_URL);
+  rootRef.once("value", function(snapshot) {
+    data = snapshot.val().data;
+    startUp();
+  });
+}
+else {
+  startUp();
+}
