@@ -1,1 +1,11 @@
-<canvas id="tracker" width="400" height="400"></canvas>
+<header>
+  <h1>Headline Tracker</h1>
+  <p>Follow the latest trends in the news</p>
+</header>
+
+{{#each data}}
+  <div class="graph" data="{{stringify this}}">
+    <h1>{{this.key}}</h1>
+    <canvas>Uh oh, your browser is too old to work with this website!</canas>
+  </div>
+{{/each}}

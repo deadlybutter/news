@@ -145,6 +145,10 @@ if (process.env.FIREBASE_URL) {
   var Firebase = require("firebase");
   var rootRef = new Firebase(process.env.FIREBASE_URL);
   rootRef.once("value", function(snapshot) {
+    if (snapshot.val() == null) {
+      startUp();
+      return;
+    }
     data = snapshot.val().data;
     startUp();
   });

@@ -5,7 +5,11 @@ var exphbs = require('express-handlebars');
 app.engine('handlebars', exphbs({
   defaultLayout: 'main',
   partialsDir: [__dirname + '/views/partials'],
-  helpers: {}
+  helpers: {
+    stringify: function(obj) {
+      return JSON.stringify(obj);
+    }
+  }
 }));
 app.set('view engine', 'handlebars');
 
@@ -25,7 +29,7 @@ app.use(express.static(path.join(__dirname, 'node_modules/@dosomething/forge/dis
 var data = {};
 
 app.get('/', function(req, res) {
-  res.render('home');
+  res.render('home', {data: data});
 });
 
 app.get('/data', function(req, res) {
@@ -44,10 +48,13 @@ function startUp() {
 if (process.env.FIREBASE_URL) {
   var Firebase = require("firebase");
   var rootRef = new Firebase(process.env.FIREBASE_URL);
-  rootRef.once("value", function(snapshot) {
+  rootRef.on('value', function(snapshot) {
+    if (snapshot.val() == null) {
+      return;
+    }
     data = snapshot.val().data;
-    startUp();
   });
+  startUp();
 }
 else {
   startUp();

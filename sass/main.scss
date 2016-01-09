@@ -1,5 +1,6 @@
 $color: #000C19;
-$background-color: #FFF;
+$container_color: #FFF;
+$page_color: #DDD;
 $spacing: 16px;
 
 * {
@@ -8,33 +9,37 @@ $spacing: 16px;
 }
 
 body {
-  background-color: $background-color;
+  background-color: $page_color;
+}
+
+.container {
+  background-color: $container_color;
+  color: $color;
+  width: 100%;
+  max-width: 960px;
+  margin-left: auto;
+  margin-right: auto;
+  -webkit-box-shadow: 0px 0px 51px 3px rgba(0,0,0,0.75);
+  -moz-box-shadow: 0px 0px 51px 3px rgba(0,0,0,0.75);
+  box-shadow: 0px 0px 51px 3px rgba(0,0,0,0.75);
+}
+
+header {
+  display: block;
   text-align: center;
 }
 
-.headline-container {
-  padding: 10px;
-}
-
-.stat {
-  display: inline-block;
-  border: 1px solid $color;
-  padding: $spacing;
-  margin: $spacing / 4;
-}
-
-a {
-  text-align: left;
-  color: $color;
-  text-decoration: none;
-  font-size: 24px;
+.graph {
+  width: 75%;
   display: block;
-  margin-top: $spacing;
-  margin-left: $spacing;
-  border-left: 1px solid $color;
-  padding: $spacing / 4;
+  margin: $spacing auto;
+  position: relative;
 
-  &:hover {
-    text-decoration: underline;
+  h1 {
+    position: absolute;
+    top: 40%;
+    margin: 0px 0 0 -50px;
+    left: 50%;
   }
+
 }
