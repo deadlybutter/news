@@ -15,7 +15,7 @@ function setupGraphCanvas($element) {
   var ctx = $canvas.get(0).getContext("2d");
 
   var parentWidth = $element.width();
-  var height = $(window).height() / 4;
+  var height = $(window).height() / 2;
 
   $canvas.attr('width', parentWidth);
   $canvas.attr('height', height);
@@ -32,19 +32,47 @@ function drawGraph(data, ctx, $canvas) {
     return data.slice().indexOf(item) == pos;
   });
 
+  var yPadding = 4;
+
+  for (var i = 0; i < yPadding; i++) {
+    var lastEntry = uniqueValues[uniqueValues.length - 1];
+    uniqueValues.push(lastEntry++);
+  }
+
+  for (var i = 0; i < yPadding; i++) {
+    var firstEntry = uniqueValues[0];
+    uniqueValues.unshift(lastEntry--);
+  }
+
   var xCol = data.length;
   var yCol = uniqueValues.length;
-  var yMin = sizeOrder[sizeOrder.length - 1];
-  var yMax = sizeOrder[0];
 
-  var xSpacing = width / xCol;
-  var ySpacing = height / yCol;
+  var xSpacing = width / (xCol / 2);
+  var ySpacing = height / (yCol / 2);
+
+  var points = [];
 
   data.forEach(function(element, index) {
-    
+    console.log(element, element * ySpacing);
+    var point = {
+      x: xSpacing * index,
+      y: uniqueValues.indexOf(element) * ySpacing
+    };
+    points.push(point);
   });
 
-  console.log("ymin " + yMin, "ymax" + yMax, "yCol " + yCol);
+  // Draw points
+  for (var i = 0; i < points.length; i++) {
+    ctx.beginPath();
+    var point1 = points[i];
+    var point2 = points[i + 1];
+    if (point2 == undefined) {
+      break;
+    }
+    ctx.moveTo(point1.x, point1.y);
+    ctx.lineTo(point2.x, point2.y);
+    ctx.stroke();
+  }
 }
 
 $(document).on('ready', function() {
@@ -56,7 +84,7 @@ $(document).on('ready', function() {
     var $canvas = canvasSetup.canvas;
     var color = getRandomColor();
     $(this).find('h1').css('color', color);
-    ctx.strokeColor = color;
+    ctx.strokeStyle = color;
     drawGraph(graphData.value, ctx, $canvas);
   });
 
