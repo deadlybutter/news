@@ -104,7 +104,9 @@ function calculateStats() {
   });
   data = tracking;
   if (process.env.FIREBASE_URL) {
-    rootRef.set({'data': data});
+    rootRef.remove(function() {
+      rootRef.set({'data': data});
+    });
   }
 }
 
