@@ -32,10 +32,6 @@ app.get('/', function(req, res) {
   res.render('home', {data: data});
 });
 
-app.get('/data', function(req, res) {
-  res.json(data);
-});
-
 function startUp() {
   var server = app.listen(process.env.PORT || 3000, function() {
     var host = server.address().address;

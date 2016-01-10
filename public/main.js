@@ -2,8 +2,26 @@ function getRandomInt(min, max) {
   return Math.floor(Math.random() * (max - min + 1)) + min;
 }
 
+function getContrast50(hexcolor){
+  return (parseInt(hexcolor, 16) > 0xffffff/2) ? 'black':'white';
+}
+
 function getRandomColor() {
-  return '#' + Math.floor(Math.random() * 16777215).toString(16);
+  var color = Math.floor(Math.random() * 16777215).toString(16);
+  var contrast = getContrast50(color);
+  return {
+    color: '#' + color,
+    contrast: contrast
+  }
+}
+
+function adjustColors(colors, ctx, $element) {
+  var color = colors.color;
+  var contrast = colors.contrast;
+  var $h1 = $element.find('h1');
+  $h1.css('color', color);
+  $h1.css('background-color', contrast);
+  ctx.strokeStyle = color;
 }
 
 function getGraphData($element) {
@@ -52,8 +70,8 @@ function drawGraph(data, ctx, $canvas) {
 
   var points = [];
 
+  //Construct points
   data.forEach(function(element, index) {
-    console.log(element, element * ySpacing);
     var point = {
       x: xSpacing * index,
       y: uniqueValues.indexOf(element) * ySpacing
@@ -62,6 +80,7 @@ function drawGraph(data, ctx, $canvas) {
   });
 
   // Draw points
+  ctx.lineWidth = 10;
   for (var i = 0; i < points.length; i++) {
     ctx.beginPath();
     var point1 = points[i];
@@ -75,6 +94,16 @@ function drawGraph(data, ctx, $canvas) {
   }
 }
 
+function addGif($element, word) {
+  $.get('http://api.giphy.com/v1/gifs/search?q=' + word + '&limit=1&rating=pg&api_key=dc6zaTOxFJmzC', function(data) {
+    if (data.data[0] == undefined) {
+      return;
+    }
+    var gifUrl = data.data[0].images.original.url;
+    $element.css('background-image', 'url(' + gifUrl + ')');
+  });
+}
+
 $(document).on('ready', function() {
 
   $('.graph').each(function() {
@@ -82,10 +111,10 @@ $(document).on('ready', function() {
     var canvasSetup = setupGraphCanvas($(this));
     var ctx = canvasSetup.ctx;
     var $canvas = canvasSetup.canvas;
-    var color = getRandomColor();
-    $(this).find('h1').css('color', color);
-    ctx.strokeStyle = color;
+    var colors = getRandomColor();
+    adjustColors(colors, ctx, $(this));
     drawGraph(graphData.value, ctx, $canvas);
+    addGif($(this), graphData.key);
   });
 
 });
