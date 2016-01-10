@@ -140,7 +140,7 @@ this.finishedScraping = function(scriptName, count) {
 
 function startUp() {
   scrapContent();
-  setInterval(scrapContent, 1000 * 60 * 2); // Run it every 2 minutes
+  setInterval(scrapContent, 1000 * 60 * (process.env.WORKER_INTERVAL || 2)); // Run it every 2 minutes
 }
 
 if (process.env.FIREBASE_URL) {
