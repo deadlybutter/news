@@ -21,7 +21,7 @@ function sortObject(obj) {
     }
   }
   arr.sort(function(a, b) {
-    return a.value - b.value;
+    return b.value - a.value;
   });
   return arr;
 }
@@ -138,9 +138,11 @@ this.finishedScraping = function(scriptName, count) {
   }
 }
 
-function startUp() {
-  scrapContent();
-  setInterval(scrapContent, 1000 * 60 * (process.env.WORKER_INTERVAL || 2)); // Run it every 2 minutes
+function startUp(initialScrap) {
+  if (initialScrap) {
+    scrapContent();
+  }
+  setInterval(scrapContent, 1000 * 60 * (process.env.WORKER_INTERVAL || 2));
 }
 
 if (process.env.FIREBASE_URL) {
@@ -152,9 +154,9 @@ if (process.env.FIREBASE_URL) {
       return;
     }
     data = snapshot.val().data;
-    startUp();
+    startUp(process.env.DEV_MODE);
   });
 }
 else {
-  startUp();
+  startUp(process.env.DEV_MODE);
 }
