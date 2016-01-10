@@ -113,8 +113,11 @@ $(document).on('ready', function() {
     var $canvas = canvasSetup.canvas;
     var colors = getRandomColor();
     adjustColors(colors, ctx, $(this));
-    drawGraph(graphData.value, ctx, $canvas);
     addGif($(this), graphData.key);
+    if (graphData.value.length <= 1) {
+      return;
+    }
+    drawGraph(graphData.value, ctx, $canvas);
   });
 
 });
