@@ -33,9 +33,18 @@ p {
   box-shadow: $box-shadow;
 }
 
+.badge {
+  position: absolute;
+  opacity: 0.8;
+  right: 0;
+}
+
 header {
   display: block;
   text-align: center;
+  width: 75%;
+  margin: auto;
+  padding-bottom: $spacing;
 }
 
 .graph {
