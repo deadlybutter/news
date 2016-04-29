@@ -6,7 +6,7 @@ var CronJob = require('cron').CronJob;
 var Firebase = require("firebase");
 var rootRef = new Firebase(process.env.FIREBASE_URL);
 
-var websites = process.env.WEBSITES ? JSON.stringify(process.env.WEBSITES) : ['http://www.nytimes.com', 'http://www.cnn.com'];
+var websites = ['http://www.nytimes.com', 'http://www.cnn.com', 'http://www.washingtonpost.com', 'http://www.politico.com/'];
 
 var crawl = [];
 
