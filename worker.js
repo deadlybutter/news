@@ -1,162 +1,102 @@
-var cheerio = require('cheerio');
+var sanitizeHtml = require('sanitize-html');
 var request = require('superagent');
+var moment = require('moment');
+var CronJob = require('cron').CronJob;
 
-var data = [];
+var Firebase = require("firebase");
+var rootRef = new Firebase(process.env.FIREBASE_URL);
 
-var wordCount = {};
+var websites = process.env.WEBSITES ? JSON.stringify(process.env.WEBSITES) : ['http://www.nytimes.com', 'http://www.cnn.com'];
 
-function getRandomInt(min, max) {
-  return Math.floor(Math.random() * (max - min + 1)) + min;
+var crawl = [];
+
+function getTrump(text) {
+  return (text.match(/trump/g) || []).length;
 }
 
-function sortObject(obj) {
-  var arr = [];
-  var prop;
-  for (prop in obj) {
-    if (obj.hasOwnProperty(prop)) {
-      arr.push({
-        'key': prop,
-        'value': [obj[prop]]
-      });
-    }
-  }
-  arr.sort(function(a, b) {
-    return b.value - a.value;
-  });
-  return arr;
+function getCruz(text) {
+  return (text.match(/cruz/g) || []).length;
 }
 
-function removeStopWords(sentence) {
-  var common = ["a", "able", "about", "across", "after", "all", "almost", "also", "am", "among", "an", "and", "any", "are", "as", "at", "be", "because", "been", "but", "by", "can", "cannot", "could", "dear", "did", "do", "does", "either", "else", "ever", "every", "for", "from", "get", "got", "had", "has", "have", "he", "her", "hers", "him", "his", "how", "however", "i", "if", "in", "into", "is", "it", "its", "just", "least", "let", "like", "likely", "may", "me", "might", "most", "must", "my", "neither", "no", "nor", "not", "of", "off", "often", "on", "only", "or", "other", "our", "own", "rather", "said", "say", "says", "she", "should", "since", "so", "some", "than", "that", "the", "their", "them", "then", "there", "these", "they", "this", "tis", "to", "too", "twas", "us", "wants", "was", "we", "were", "what", "when", "where", "which", "while", "who", "whom", "why", "will", "with", "would", "yet", "you", "your", "ain't", "aren't", "can't", "could've", "couldn't", "didn't", "doesn't", "don't", "hasn't", "he'd", "he'll", "he's", "how'd", "how'll", "how's", "i'd", "i'll", "i'm", "i've", "isn't", "it's", "might've", "mightn't", "must've", "mustn't", "shan't", "she'd", "she'll", "she's", "should've", "shouldn't", "that'll", "that's", "there's", "they'd", "they'll", "they're", "they've", "wasn't", "we'd", "we'll", "we're", "weren't", "what'd", "what's", "when'd", "when'll", "when's", "where'd", "where'll", "where's", "who'd", "who'll", "who's", "why'd", "why'll", "why's", "won't", "would've", "wouldn't", "you'd", "you'll", "you're", "you've"];
-  // adding words in addition to the default list i copied from the internets
-  common.push.apply(common, ["re", "see", "s", "t", "again", "more", "less", "now", "don", "new", "review", "day", "two", "time", "wrong", "over", "play", "editorial", "anger", "during", "pictures", "one", "long", "out", "really", "turns", "regrets", "being"]);
-  var wordArr = sentence.match(/\w+/g),
-      commonObj = {},
-      uncommonArr = [],
-      word, i;
-
-  for (i = 0; i < common.length; i++) {
-    commonObj[ common[i].trim() ] = true;
-  }
-
-  if (wordArr == undefined) {
-    return uncommonArr;
-  }
-  for (i = 0; i < wordArr.length; i++) {
-    word = wordArr[i].trim().toLowerCase();
-    if (!commonObj[word]) {
-      uncommonArr.push(word);
-    }
-  }
-  return uncommonArr;
+function getKasich(text) {
+  return (text.match(/kasich/g) || []).length;
 }
 
-this.getContent = function(url, callback) {
+function getSanders(text) {
+  return (text.match(/sanders/g) || []).length + (text.match(/bernie/g) || []).length;
+}
+
+function getClinton(text) {
+  return (text.match(/clinton/g) || []).length + (text.match(/hillary/g) || []).length;
+}
+
+function scrapWebsites(candidate, getCount, websiteIndex, done) {
+  var url = websites[websiteIndex];
   request
     .get(url)
-    .end(function(err, webpageData) {
-      if (err) {
-        callback("");
+    .end(function(req, res) {
+      var raw = res.text;
+      var clean = sanitizeHtml(raw);
+      var count = getCount(clean);
+      candidate.count += count;
+
+      websiteIndex++;
+      if (websiteIndex >= websites.length) {
+        done(candidate);
         return;
       }
-      callback(webpageData.text);
+      scrapWebsites(candidate, getCount, websiteIndex, done);
     });
 }
 
-this.buildHeadline = function(text) {
-  words = removeStopWords(text);
-  words.forEach(function(element) {
-    if (wordCount[element] == undefined) {
-      wordCount[element] = 1;
-    }
-    else {
-      wordCount[element]++;
-    }
-  });
-}
+function doCrawl() {
+  crawl.push({meta: true, timestamp: moment().format()});
+  scrapWebsites({name: "Donald Trump", count: 0}, getTrump, 0, function(candidate) {
+    crawl.push(candidate);
+    scrapWebsites({name: "Ted Cruz", count: 0}, getCruz, 0, function(candidate) {
+      crawl.push(candidate);
+      scrapWebsites({name: "John Kasich", count: 0}, getKasich, 0, function(candidate) {
+        crawl.push(candidate);
+        scrapWebsites({name: "Bernie Sanders", count: 0}, getSanders, 0, function(candidate) {
+          crawl.push(candidate);
+          scrapWebsites({name: "Hillary Clinton", count: 0}, getClinton, 0, function(candidate) {
+            crawl.push(candidate);
 
-function calculateStats() {
-  var sorted = sortObject(wordCount);
-  var existingData = [];
-  if (data != undefined) {
-    existingData = data.slice();
-  }
-  var tracking = [];
-  sorted.forEach(function(element, index) {
+            rootRef.once("value", function(snapshot) {
+              if (snapshot.val() == null) {
+                crawls = [];
+              }
+              else {
+                crawls = snapshot.val().crawls;
 
-    if (element.value[0] < 3) {
-      return;
-    }
+                if (!crawls) {
+                  crawls = [];
+                }
+              }
 
-    if (existingData != undefined) {
-      existingData.forEach(function(existingElement) {
-        if (existingElement.key == element.key) {
-          existingElement.value.push(element.value[0]);
-          if (existingElement.value.length > 50) {
-            existingElement.value.shift();
-          }
-          element.value = existingElement.value;
-        }
+              if (crawls.length >= 48) {
+                crawls.shift();
+              }
+
+              crawls.push(crawl);
+              rootRef.set({'crawls': crawls});
+              crawl = [];
+            });
+
+          });
+        });
       });
-    }
-
-    tracking.push(element);
-  });
-  data = tracking;
-  if (process.env.FIREBASE_URL) {
-    rootRef.remove(function() {
-      rootRef.set({'data': data});
     });
-  }
-}
-
-// LOAD SCRAPERS
-var worker = this;
-var fs = require('fs');
-var scripts = fs.readdirSync(__dirname + '/scrapers');
-var scriptChecklist = scripts.slice();
-function scrapContent() {
-  // Reset stuff
-  scriptChecklist = scripts.slice();
-  wordCount = {};
-
-  // Load scripts dynamically
-  scripts.forEach(function(element) {
-    var Mod = require(__dirname + '/scrapers/' + element);
-    var scraper = new Mod();
-    scraper.search(cheerio, worker);
   });
 }
 
-this.finishedScraping = function(scriptName, count) {
-  if (count == 0) {
-    console.log("WARNING! Scraper did not scrap anything! ", scriptName);
-  }
-  scriptChecklist.splice(scriptChecklist.indexOf(scriptName), 1);
-  if (scriptChecklist.length == 0) {
-    calculateStats();
-  }
+if (process.env.MODE == "DEV") {
+  new CronJob('*/10 * * * * *', function() {
+    doCrawl();
+  }, null, true, 'America/New_York');
 }
-
-function startUp(initialScrap) {
-  if (initialScrap) {
-    scrapContent();
-  }
-  setInterval(scrapContent, 1000 * 60 * (process.env.WORKER_INTERVAL || 2));
-}
-
-if (process.env.FIREBASE_URL) {
-  var Firebase = require("firebase");
-  var rootRef = new Firebase(process.env.FIREBASE_URL);
-  rootRef.once("value", function(snapshot) {
-    if (snapshot.val() == null) {
-      startUp();
-      return;
-    }
-    data = snapshot.val().data;
-    startUp(process.env.DEV_MODE);
-  });
-}
-else {
-  startUp(process.env.DEV_MODE);
+else if (process.env.MODE == "PROD") {
+  new CronJob('0 */30 * * * *', function() {
+    doCrawl();
+  }, null, true, 'America/New_York');
 }

@@ -12,19 +12,7 @@ app.engine('handlebars', exphbs({
   }
 }));
 app.set('view engine', 'handlebars');
-
-var sassMiddleware = require('node-sass-middleware');
-var path = require('path');
-app.use(sassMiddleware({
-    src: path.join(__dirname, 'sass'),
-    dest: path.join(__dirname, 'public'),
-    debug: true,
-    outputStyle: 'compressed',
-    prefix:  '/prefix'
-}));
-
-app.use(express.static(path.join(__dirname, 'public')));
-app.use(express.static(path.join(__dirname, 'node_modules/@dosomething/forge/dist')));
+app.use(express.static('public'));
 
 var data = {};
 
@@ -37,7 +25,7 @@ function startUp() {
     var host = server.address().address;
     var port = server.address().port;
 
-    console.log('Example app listening at http://%s:%s', host, port);
+    console.log('App listening at http://%s:%s', host, port);
   });
 }
 
@@ -48,7 +36,7 @@ if (process.env.FIREBASE_URL) {
     if (snapshot.val() == null) {
       return;
     }
-    data = snapshot.val().data;
+    data = snapshot.val().crawls;
   });
   startUp();
 }

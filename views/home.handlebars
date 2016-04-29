@@ -1,13 +1,6 @@
-<img class="badge" src="giphybadge.gif" />
-
 <header>
-  <h1>Headline Tracker</h1>
-  <p>Follow the latest words trending in the news</p>
+  <h1>Candidate Tracker</h1>
+  <p>Whos getting the attention today?</p>
 </header>
 
-{{#each data}}
-  <div class="graph" data="{{stringify this}}">
-    <h1>{{this.key}}</h1>
-    <canvas>Uh oh, your browser is too old to work with this website!</canas>
-  </div>
-{{/each}}
+<div id="graph" data-candidates="{{stringify data}}"></div>
