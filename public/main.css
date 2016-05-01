@@ -17,6 +17,17 @@ header {
   margin-bottom: 16px;
 }
 
+#subgraphs {
+  margin-top: 10px;
+}
+
+.chart {
+  width: 800px;
+  text-align: center;
+  display: inline-block;
+  margin-top: 40px;
+}
+
 footer {
   margin-top: 64px;
 }

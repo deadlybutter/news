@@ -39,6 +39,7 @@ function scrapWebsites(candidate, getCount, websiteIndex, done) {
       var clean = sanitizeHtml(raw);
       var count = getCount(clean);
       candidate.count += count;
+      candidate.siteCounts.push({total: count, site: url});
 
       websiteIndex++;
       if (websiteIndex >= websites.length) {
@@ -51,15 +52,15 @@ function scrapWebsites(candidate, getCount, websiteIndex, done) {
 
 function doCrawl() {
   crawl.push({meta: true, timestamp: moment().format()});
-  scrapWebsites({name: "Donald Trump", count: 0}, getTrump, 0, function(candidate) {
+  scrapWebsites({name: "Donald Trump", count: 0, siteCounts: []}, getTrump, 0, function(candidate) {
     crawl.push(candidate);
-    scrapWebsites({name: "Ted Cruz", count: 0}, getCruz, 0, function(candidate) {
+    scrapWebsites({name: "Ted Cruz", count: 0, siteCounts: []}, getCruz, 0, function(candidate) {
       crawl.push(candidate);
-      scrapWebsites({name: "John Kasich", count: 0}, getKasich, 0, function(candidate) {
+      scrapWebsites({name: "John Kasich", count: 0, siteCounts: []}, getKasich, 0, function(candidate) {
         crawl.push(candidate);
-        scrapWebsites({name: "Bernie Sanders", count: 0}, getSanders, 0, function(candidate) {
+        scrapWebsites({name: "Bernie Sanders", count: 0, siteCounts: []}, getSanders, 0, function(candidate) {
           crawl.push(candidate);
-          scrapWebsites({name: "Hillary Clinton", count: 0}, getClinton, 0, function(candidate) {
+          scrapWebsites({name: "Hillary Clinton", count: 0, siteCounts: []}, getClinton, 0, function(candidate) {
             crawl.push(candidate);
 
             rootRef.once("value", function(snapshot) {
