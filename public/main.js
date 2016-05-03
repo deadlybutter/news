@@ -10,9 +10,8 @@ function buildOverallGraph(data) {
   var svg = dimple.newSvg("#graph", "100%", 600);
   var chart = new dimple.chart(svg, data);
   // chart.setBounds(60, 30, 505, 305);timestamp_readable
-  var x = chart.addCategoryAxis("x", ["timestamp_readable", "timestamp"]);
+  var x = chart.addCategoryAxis("x", "timestamp");
   x.addOrderRule("Date");
-  x.title = "Timestamp";
   chart.addMeasureAxis("y", "count");
   var s = chart.addSeries("candidate", dimple.plot.line);
   // s.interpolation = "step";
