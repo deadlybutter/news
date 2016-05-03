@@ -9,8 +9,8 @@ function setColors(chart) {
 function buildOverallGraph(data) {
   var svg = dimple.newSvg("#graph", "100%", 600);
   var chart = new dimple.chart(svg, data);
-  // chart.setBounds(60, 30, 505, 305);
-  var x = chart.addCategoryAxis("x", "timestamp");
+  // chart.setBounds(60, 30, 505, 305);timestamp_readable
+  var x = chart.addCategoryAxis("x", ["timestamp_readable", "timestamp"]);
   x.addOrderRule("Date");
   chart.addMeasureAxis("y", "count");
   var s = chart.addSeries("candidate", dimple.plot.line);
@@ -48,10 +48,12 @@ $(document).on('ready', function() {
   rawGraphData.forEach(function(candidates) {
     var meta = candidates.shift();
     var timestamp = meta.timestamp;
+    var timestamp_readable = new Date(timestamp).toLocaleString('en-US', {hour: 'numeric', hour12: true});
 
     candidates.forEach(function(c) {
       graphData.push({
         "timestamp": timestamp,
+        "timestamp_readable": timestamp_readable,
         "candidate": c.name,
         "count": c.count
       });

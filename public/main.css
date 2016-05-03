@@ -19,10 +19,18 @@ header {
 
 #subgraphs {
   margin-top: 10px;
+  text-align: center;
 }
 
-#subgraphs div{
-  text-align: center;
+#subgraphs hr {
+  margin-top: 48px;
+}
+
+#subgraphs h3 {
+  padding-top: 16px;
+}
+
+#subgraphs div {
   padding-top: 48px;
 }
 
