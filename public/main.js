@@ -12,9 +12,10 @@ function buildOverallGraph(data) {
   // chart.setBounds(60, 30, 505, 305);timestamp_readable
   var x = chart.addCategoryAxis("x", ["timestamp_readable", "timestamp"]);
   x.addOrderRule("Date");
+  x.title = "Timestamp";
   chart.addMeasureAxis("y", "count");
-  var s = chart.addSeries("candidate", dimple.plot.bubble);
-  s.interpolation = "step";
+  var s = chart.addSeries("candidate", dimple.plot.line);
+  // s.interpolation = "step";
   chart.addLegend(150, 10, 700, 20, "left");
   setColors(chart);
   chart.draw();
@@ -48,7 +49,12 @@ $(document).on('ready', function() {
   rawGraphData.forEach(function(candidates) {
     var meta = candidates.shift();
     var timestamp = meta.timestamp;
-    var timestamp_readable = new Date(timestamp).toLocaleString('en-US', {hour: 'numeric', hour12: true});
+    var timestamp_readable = new Date(timestamp).toLocaleString('en-US', {
+      hour: 'numeric',
+      day: 'numeric',
+      month: 'short',
+      hour12: true
+    });
 
     candidates.forEach(function(c) {
       graphData.push({
