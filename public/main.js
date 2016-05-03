@@ -13,7 +13,7 @@ function buildOverallGraph(data) {
   var x = chart.addCategoryAxis("x", ["timestamp_readable", "timestamp"]);
   x.addOrderRule("Date");
   chart.addMeasureAxis("y", "count");
-  var s = chart.addSeries("candidate", dimple.plot.line);
+  var s = chart.addSeries("candidate", dimple.plot.bubble);
   s.interpolation = "step";
   chart.addLegend(150, 10, 700, 20, "left");
   setColors(chart);
