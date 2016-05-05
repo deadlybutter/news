@@ -25,7 +25,15 @@ function buildOverallGraph(data) {
            for (var i = 0; i < data.length; i++) {
                if (data[i].timestamp === d) {
                  var d = new Date(data[i].timestamp);
-                 return d.getHours() + ':' + d.getMinutes();
+                 var h = d.getHours();
+                 var m = d.getMinutes();
+                 var zone = "AM, EDT"
+
+                 if (h > 12) {
+                   h -= 12;
+                   zone = "PM, EDT";
+                 }
+                 return h + ':' + m + ', ' + zone;
                }
            }
        });
