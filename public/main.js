@@ -18,6 +18,17 @@ function buildOverallGraph(data) {
   chart.addLegend(150, 10, 700, 20, "left");
   setColors(chart);
   chart.draw();
+
+  x.shapes
+   .selectAll("text")
+       .text(function (d) {
+           for (var i = 0; i < data.length; i++) {
+               if (data[i].timestamp === d) {
+                 var d = new Date(data[i].timestamp);
+                 return d.getHours() + ':' + d.getMinutes();
+               }
+           }
+       });
 }
 
 function buildSiteGraph(data, site, id) {
