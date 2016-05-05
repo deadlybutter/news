@@ -7,7 +7,7 @@ function setColors(chart) {
 }
 
 function buildOverallGraph(data) {
-  var svg = dimple.newSvg("#graph", "100%", 600);
+  var svg = dimple.newSvg("#graph", "100%", 800);
   var chart = new dimple.chart(svg, data);
   // chart.setBounds(60, 30, 505, 305);timestamp_readable
   var x = chart.addCategoryAxis("x", "timestamp");
